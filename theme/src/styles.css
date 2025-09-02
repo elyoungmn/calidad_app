@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Demo styles so you can see it's working */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition
+          bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+}
+.card {
+  @apply rounded-xl border p-4 shadow-sm bg-white;
+}

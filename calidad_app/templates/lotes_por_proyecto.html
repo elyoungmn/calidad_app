@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container max-w-4xl mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-md p-6">
+    <div class="border-b border-gray-200 pb-4 mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Proyecto: {{ proyecto.nombre }}</h2>
+    </div>
+    
+    {% if lotes %}
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {% for lote in lotes %}
+            <div class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-lg font-medium text-gray-900">Lote ID: {{ lote.id_lote }}</p>
+                  <p class="text-sm text-gray-500">Fecha: {{ lote.fecha_registro|date:"d/m/Y H:i" }}</p>
+                </div>
+                <a href="{% url 'detalle_lote' lote.id %}" class="btn btn-primary">
+                  Ver Detalle
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="text-center py-12">
+
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay lotes registrados para este proyecto</h3>
+        <p class="mt-1 text-sm text-gray-500">Registra un nuevo lote para comenzar</p>
+      </div>
+    {% endif %}
+
+    <div class="flex justify-end mt-6">
+      <a href="{% url 'ver_proyectos' %}" 
+         class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Volver a Proyectos
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

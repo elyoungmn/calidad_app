@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold">Detalle del Lote: {{ lote.id_lote }}</h2>
+            <div class="flex space-x-4">
+                <a href="{% url 'ver_lotes' %}" class="btn btn-secondary">
+                    Volver a Lotes
+                </a>
+                <a href="{% url 'descargar_zip' lote.id %}" class="btn btn-primary">
+                    Descargar ZIP
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <h3 class="text-lg font-semibold mb-4">Información básica</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Proyecto:</span>
+                        <span class="font-medium">{{ lote.proyecto.nombre }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Fecha de registro:</span>
+                        <span class="font-medium">{{ lote.fecha_registro }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <h3 class="text-lg font-semibold mb-4">Documentos</h3>
+                <div class="space-y-4">
+                    {% if lote.analisis_espectrometrico %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Análisis espectrométrico:</span>
+                        <a href="{{ lote.analisis_espectrometrico.url }}" 
+                           target="_blank" 
+                           class="text-blue-600 hover:text-blue-800 hover:underline">
+                            Descargar
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if lote.tolerancia_geometrica %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Tolerancia geométrica:</span>
+                        <a href="{{ lote.tolerancia_geometrica.url }}" 
+                           target="_blank" 
+                           class="text-blue-600 hover:text-blue-800 hover:underline">
+                            Descargar
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if lote.prueba_dureza %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Prueba de dureza:</span>
+                        <a href="{{ lote.prueba_dureza.url }}" 
+                           target="_blank" 
+                           class="text-blue-600 hover:text-blue-800 hover:underline">
+                            Descargar
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if lote.plano_original %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Plano original:</span>
+                        <a href="{{ lote.plano_original.url }}" 
+                           target="_blank" 
+                           class="text-blue-600 hover:text-blue-800 hover:underline">
+                            Descargar
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if lote.evidencia_fotografica %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Evidencia fotográfica:</span>
+                        <a href="{{ lote.evidencia_fotografica.url }}" 
+                           target="_blank" 
+                           class="text-blue-600 hover:text-blue-800 hover:underline">
+                            Ver
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold">Proyectos</h2>
+      <a href="{% url 'crear_proyecto' %}" class="btn btn-primary">
+        Nuevo Proyecto
+      </a>
+    </div>
+
+    {% if proyectos %}
+      <div class="space-y-4">
+        {% for proyecto in proyectos %}
+          <div class="hover:shadow-md p-4 rounded-lg border border-gray-200 transition-all">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-medium text-lg">{{ proyecto.nombre }}</h3>
+                <p class="text-sm text-gray-500 mt-1">{{ proyecto.descripcion|truncatewords:10 }}</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <a href="{% url 'lotes_por_proyecto' proyecto.id %}" class="btn btn-secondary">
+                  Ver Lotes
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-8">
+        <p class="text-gray-500">No hay proyectos registrados</p>
+        <p class="text-sm text-gray-400 mt-2">Crea un nuevo proyecto para comenzar</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

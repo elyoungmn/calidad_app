@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="flex flex-col gap-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold">Selecciona un proyecto</h2>
+        <a href="{% url 'crear_proyecto' %}" class="btn btn-primary">
+          Crear Proyecto
+        </a>
+      </div>
+      
+      {% if proyectos %}
+      <div class="space-y-4">
+        {% for proyecto in proyectos %}
+        <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-medium">{{ proyecto.nombre }}</h3>
+              <p class="text-sm text-gray-500">{{ proyecto.descripcion|truncatewords:10 }}</p>
+            </div>
+            <a href="{% url 'registrar_lote' proyecto.id %}" class="btn btn-primary">
+              Registrar Lote
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-8">
+        <p class="text-gray-500">No hay proyectos disponibles</p>
+        <p class="text-sm text-gray-400 mt-2">Crea un nuevo proyecto para comenzar</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
