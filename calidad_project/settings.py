@@ -12,13 +12,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions', 'django.contrib.messages', 'django.contrib.staticfiles',
     'widget_tweaks',
     'calidad_app',
+    
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware','django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware','django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware','django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'calidad_app.middleware.CurrentUserMiddleware',  # <-- NUEVO
 ]
 
 ROOT_URLCONF = 'calidad_project.urls'

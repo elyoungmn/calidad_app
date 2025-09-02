@@ -1,38 +1,38 @@
 {% extends 'base.html' %}
+{% block title %}Seleccionar proyecto · Registrar Lote{% endblock %}
 {% block content %}
-<div class="container">
-  <div class="card">
-    <div class="flex flex-col gap-4">
-      <div class="flex justify-between items-center">
-        <h2 class="text-2xl font-bold">Selecciona un proyecto</h2>
-        <a href="{% url 'crear_proyecto' %}" class="btn btn-primary">
-          Crear Proyecto
-        </a>
-      </div>
-      
-      {% if proyectos %}
-      <div class="space-y-4">
-        {% for proyecto in proyectos %}
-        <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-medium">{{ proyecto.nombre }}</h3>
-              <p class="text-sm text-gray-500">{{ proyecto.descripcion|truncatewords:10 }}</p>
-            </div>
-            <a href="{% url 'registrar_lote' proyecto.id %}" class="btn btn-primary">
-              Registrar Lote
-            </a>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-      {% else %}
-      <div class="text-center py-8">
-        <p class="text-gray-500">No hay proyectos disponibles</p>
-        <p class="text-sm text-gray-400 mt-2">Crea un nuevo proyecto para comenzar</p>
-      </div>
-      {% endif %}
+<div class="card p-4">
+  <h1 class="h5 mb-3">Seleccionar proyecto para registrar un Lote</h1>
+
+  {% if proyectos %}
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Proyecto</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Avance</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in proyectos %}
+            <tr>
+              <td>{{ p.nombre }}</td>
+              <td>{{ p.cliente|default:"—" }}</td>
+              <td>{{ p.piezas_totales|default:0 }}</td>
+              <td>{{ p.calcular_avance }}%</td>
+              <td class="text-end">
+                <a class="btn btn-primary btn-sm" href="{% url 'registrar_lote' p.id %}">Elegir</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  </div>
+  {% else %}
+    <div class="text-center text-muted py-5">No hay proyectos disponibles.</div>
+  {% endif %}
 </div>
 {% endblock %}

@@ -1,62 +1,37 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}Iniciar sesión · Calidad{% endblock %}
 {% block content %}
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-md w-full space-y-8">
-    <div>
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Iniciar sesión</h2>
+<div class="card p-4 mx-auto" style="max-width: 420px;">
+  <h1 class="h5 mb-3 text-center">Iniciar sesión</h1>
+
+  {% if form.errors %}
+    <div class="alert alert-danger">Usuario o contraseña inválidos.</div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.username.id_for_label }}">Nombre de usuario</label>
+      {{ form.username.as_widget(attrs={
+        'class': 'form-control',
+        'placeholder': 'Nombre de usuario',
+        'autofocus': 'autofocus'
+      }) }}
     </div>
-    <form class="mt-8 space-y-6" method="post">
-      {% csrf_token %}
-      {% for field in form %}
-        <div class="rounded-md shadow-sm -space-y-px">
-          <div class="mb-4">
-            <label for="{{ field.id_for_label }}" class="sr-only">{{ field.label }}</label>
-            <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" 
-                   class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                   placeholder="{{ field.label }}">
-            {% if field.errors %}
-              <div class="mt-2 text-sm text-red-600">
-                {% for error in field.errors %}
-                  <p>{{ error }}</p>
-                {% endfor %}
-              </div>
-            {% endif %}
-          </div>
-        </div>
-      {% endfor %}
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <input type="checkbox" name="remember" id="remember" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-          <label for="remember" class="ml-2 block text-sm text-gray-900"> Recordarme </label>
-        </div>
-        <div class="text-sm">
-          <a href="{% url 'password_reset' %}" class="font-medium text-blue-600 hover:text-blue-500"> Olvidaste tu contraseña? </a>
-        </div>
-      </div>
-      <div>
-        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border-2 border-blue-600 text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-          </svg>
-          Entrar
-        </button>
-      </div>
-    </form>
-    <div class="mt-6">
-      <div class="relative">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
-        </div>
-        <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-white text-gray-500">¿No tienes cuenta?</span>
-        </div>
-      </div>
-      <div class="mt-6">
-        <a href="{% url 'registro_usuario' %}" class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50">
-          Regístrate
-        </a>
-      </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.password.id_for_label }}">Contraseña</label>
+      {{ form.password.as_widget(attrs={
+        'class': 'form-control',
+        'placeholder': 'Contraseña'
+      }) }}
     </div>
-  </div>
+
+    <div class="d-grid">
+      <!-- Botón con alto contraste (ámbar) definido en base.html como .btn-accent -->
+      <button class="btn btn-warning btn-lg w-100" type="submit">Iniciar sesión</button>
+    </div>
+  </form>
 </div>
 {% endblock %}

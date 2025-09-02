@@ -1,94 +1,74 @@
 {% extends 'base.html' %}
+{% block title %}Detalle Lote {{ lote.id_lote }}{% endblock %}
 {% block content %}
-<div class="container">
-    <div class="card">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold">Detalle del Lote: {{ lote.id_lote }}</h2>
-            <div class="flex space-x-4">
-                <a href="{% url 'ver_lotes' %}" class="btn btn-secondary">
-                    Volver a Lotes
-                </a>
-                <a href="{% url 'descargar_zip' lote.id %}" class="btn btn-primary">
-                    Descargar ZIP
-                </a>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-gray-50 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4">Información básica</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Proyecto:</span>
-                        <span class="font-medium">{{ lote.proyecto.nombre }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Fecha de registro:</span>
-                        <span class="font-medium">{{ lote.fecha_registro }}</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-gray-50 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4">Documentos</h3>
-                <div class="space-y-4">
-                    {% if lote.analisis_espectrometrico %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Análisis espectrométrico:</span>
-                        <a href="{{ lote.analisis_espectrometrico.url }}" 
-                           target="_blank" 
-                           class="text-blue-600 hover:text-blue-800 hover:underline">
-                            Descargar
-                        </a>
-                    </div>
-                    {% endif %}
-
-                    {% if lote.tolerancia_geometrica %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Tolerancia geométrica:</span>
-                        <a href="{{ lote.tolerancia_geometrica.url }}" 
-                           target="_blank" 
-                           class="text-blue-600 hover:text-blue-800 hover:underline">
-                            Descargar
-                        </a>
-                    </div>
-                    {% endif %}
-
-                    {% if lote.prueba_dureza %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Prueba de dureza:</span>
-                        <a href="{{ lote.prueba_dureza.url }}" 
-                           target="_blank" 
-                           class="text-blue-600 hover:text-blue-800 hover:underline">
-                            Descargar
-                        </a>
-                    </div>
-                    {% endif %}
-
-                    {% if lote.plano_original %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Plano original:</span>
-                        <a href="{{ lote.plano_original.url }}" 
-                           target="_blank" 
-                           class="text-blue-600 hover:text-blue-800 hover:underline">
-                            Descargar
-                        </a>
-                    </div>
-                    {% endif %}
-
-                    {% if lote.evidencia_fotografica %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Evidencia fotográfica:</span>
-                        <a href="{{ lote.evidencia_fotografica.url }}" 
-                           target="_blank" 
-                           class="text-blue-600 hover:text-blue-800 hover:underline">
-                            Ver
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h5 mb-0">Detalle del Lote: {{ lote.id_lote }}</h1>
+    <div class="d-flex gap-2">
+      <a href="{% url 'lotes_por_proyecto' lote.proyecto.id %}" class="btn btn-light btn-sm">Volver al Proyecto</a>
+      <a href="{% url 'descargar_zip' lote.id %}" class="btn btn-primary btn-sm">Descargar ZIP</a>
     </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="p-3 border rounded-4 bg-white h-100">
+        <h2 class="h6 mb-3">Información básica</h2>
+        <dl class="row mb-0">
+          <dt class="col-5">Proyecto</dt><dd class="col-7">{{ lote.proyecto.nombre }}</dd>
+          <dt class="col-5">Fecha</dt><dd class="col-7">{{ lote.fecha|date:"d/m/Y" }}</dd>
+          <dt class="col-5">Creado</dt><dd class="col-7">{{ lote.creado|date:"d/m/Y H:i" }}</dd>
+          <dt class="col-5">Partes</dt><dd class="col-7">{{ lote.numero_partes }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="p-3 border rounded-4 bg-white h-100">
+        <h2 class="h6 mb-3">Documentos</h2>
+        <ul class="list-unstyled mb-0">
+          {% if lote.analisis_espectrometrico %}
+            <li class="mb-2 d-flex justify-content-between">
+              <span>Análisis espectrométrico</span>
+              <a href="{{ lote.analisis_espectrometrico.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Descargar</a>
+            </li>
+          {% endif %}
+          {% if lote.tolerancia_geometrica %}
+            <li class="mb-2 d-flex justify-content-between">
+              <span>Tolerancia geométrica</span>
+              <a href="{{ lote.tolerancia_geometrica.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Descargar</a>
+            </li>
+          {% endif %}
+          {% if lote.prueba_dureza %}
+            <li class="mb-2 d-flex justify-content-between">
+              <span>Prueba de dureza</span>
+              <a href="{{ lote.prueba_dureza.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Descargar</a>
+            </li>
+          {% endif %}
+          {% if lote.prueba_tension %}
+            <li class="mb-2 d-flex justify-content-between">
+              <span>Prueba de tensión</span>
+              <a href="{{ lote.prueba_tension.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Descargar</a>
+            </li>
+          {% endif %}
+          {% if lote.plano_original %}
+            <li class="mb-2 d-flex justify-content-between">
+              <span>Plano original</span>
+              <a href="{{ lote.plano_original.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Descargar</a>
+            </li>
+          {% endif %}
+          {% if lote.evidencia_fotografica %}
+            <li class="mb-2 d-flex justify-content-between">
+              <span>Evidencia fotográfica</span>
+              <a href="{{ lote.evidencia_fotografica.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Ver</a>
+            </li>
+          {% endif %}
+          {% if not lote.analisis_espectrometrico and not lote.tolerancia_geometrica and not lote.prueba_dureza and not lote.prueba_tension and not lote.plano_original and not lote.evidencia_fotografica %}
+            <li class="text-muted">Sin documentos adjuntos</li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

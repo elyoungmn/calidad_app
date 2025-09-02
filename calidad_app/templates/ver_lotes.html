@@ -1,65 +1,43 @@
 {% extends 'base.html' %}
-{% load static %}
-
+{% block title %}Todos los Lotes · Calidad{% endblock %}
 {% block content %}
-<div class="container">
-    <div class="card">
-        <div class="flex flex-col gap-4">
-            <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Lotes Registrados</h2>
-                <div class="flex gap-4">
-                    <div class="relative">
-                        <input type="text" name="search" id="search" 
-                               class="form-control pl-4 pr-3" 
-                               placeholder="Buscar lote...">
-                    </div>
-                    {% if lote.proyecto.id %}
-                    <a href="{% url 'registrar_lote' lote.proyecto.id %}" 
-                       class="btn btn-primary">
-                        Registrar Lote
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Lotes Registrados</h1>
+    <!-- Corregido: antes apuntaba a 'seleccionar_proyecto_para_lote' -->
+    <a href="{% url 'ver_proyectos' %}" class="btn btn-primary btn-sm" title="Elige un proyecto y registra el lote desde ahí">
+      Registrar Lote
+    </a>
+  </div>
 
-            {% if lotes %}
-            <div class="space-y-4">
-                {% for lote in lotes %}
-                <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl font-medium text-gray-900">{{ lote.id|stringformat:"05d" }}</span>
-                            <span class="text-gray-500">{{ lote.nombre }}</span>
-                        </div>
-                        <div class="text-gray-500">{{ lote.proyecto.nombre }}</div>
-                        <div class="text-gray-400">{{ lote.fecha_registro|date:"d/m/Y H:i" }}</div>
-                        <div class="flex gap-2">
-                            {% if lote.id %}
-                            <a href="{% url 'detalle_lote' lote.id %}" 
-                               class="btn btn-primary">
-                                Ver Detalle
-                            </a>
-                            <a href="{% url 'descargar_zip' lote.id %}" 
-                               class="btn btn-secondary">
-                                Descargar ZIP
-                            </a>
-                            {% else %}
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                ID no disponible
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="text-center py-8">
-                <p class="text-gray-500">No hay lotes registrados</p>
-                <p class="text-sm text-gray-400 mt-2">Comienza registrando un nuevo lote</p>
-            </div>
-            {% endif %}
-        </div>
+  {% if lotes %}
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>ID Lote</th>
+            <th>Proyecto</th>
+            <th>Fecha</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lote in lotes %}
+            <tr>
+              <td>{{ lote.id_lote }}</td>
+              <td>{{ lote.proyecto.nombre }}</td>
+              <td>{{ lote.fecha|date:"d/m/Y" }}</td>
+              <td class="text-end">
+                <a href="{% url 'detalle_lote' lote.id %}" class="btn btn-outline-primary btn-sm">Detalle</a>
+                <a href="{% url 'descargar_zip' lote.id %}" class="btn btn-secondary btn-sm">Descargar ZIP</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  {% else %}
+    <div class="text-center text-muted py-5">No hay lotes registrados.</div>
+  {% endif %}
 </div>
 {% endblock %}
