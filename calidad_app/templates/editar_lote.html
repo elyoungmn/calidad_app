@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
-{% block title %}Registrar Lote · {{ proyecto.nombre }}{% endblock %}
+{% block title %}Editar Lote · {{ proyecto.nombre }}{% endblock %}
 
 {% block content %}
 <div class="card p-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h5 mb-0">Registrar Lote — {{ proyecto.nombre }}</h1>
-    <a href="{% url 'lotes_por_proyecto' proyecto.id %}" class="btn btn-light btn-sm">Volver</a>
+    <h1 class="h5 mb-0">Editar Lote — {{ proyecto.nombre }}</h1>
+    <div class="d-flex gap-2">
+      <a href="{% url 'detalle_lote' lote.id %}" class="btn btn-light btn-sm">Ver detalle</a>
+      <a href="{% url 'lotes_por_proyecto' proyecto.id %}" class="btn btn-light btn-sm">Volver</a>
+    </div>
   </div>
 
   <form method="post" enctype="multipart/form-data" novalidate>
@@ -28,80 +31,91 @@
         {{ form.numero_partes }}
         {% if form.numero_partes.errors %}<div class="text-danger small mt-1">{{ form.numero_partes.errors }}</div>{% endif %}
       </div>
+
+      {% if form.subido_por %}
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.subido_por.id_for_label }}">Responsable (subido por)</label>
+        {{ form.subido_por }}
+        <div class="form-text">Cambia el responsable si fue asignado incorrectamente.</div>
+        {% if form.subido_por.errors %}<div class="text-danger small mt-1">{{ form.subido_por.errors }}</div>{% endif %}
+      </div>
+      {% endif %}
     </div>
 
-    <!-- Documentos del lote (uniformados) -->
     <hr class="my-4">
     <h2 class="h6 mb-3">Documentos del lote</h2>
 
     <div class="row g-3">
       <div class="col-md-6">
-        <label class="form-label" for="{{ form.analisis_espectrometrico.id_for_label }}">
-          Análisis espectrométrico
-        </label>
+        <label class="form-label" for="{{ form.analisis_espectrometrico.id_for_label }}">Análisis espectrométrico</label>
         <div class="input-group">
           <span class="input-group-text">Archivo</span>
           {{ form.analisis_espectrometrico }}
         </div>
-        <div class="form-text">Tipos permitidos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
+        {% if lote.analisis_espectrometrico %}
+          <div class="form-text">Actual: <a href="{{ lote.analisis_espectrometrico.url }}" target="_blank">ver archivo</a></div>
+        {% endif %}
+        <div class="form-text">Tipos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
         {% if form.analisis_espectrometrico.errors %}<div class="text-danger small mt-1">{{ form.analisis_espectrometrico.errors }}</div>{% endif %}
       </div>
 
       <div class="col-md-6">
-        <label class="form-label" for="{{ form.tolerancia_geometrica.id_for_label }}">
-          Tolerancia geométrica
-        </label>
+        <label class="form-label" for="{{ form.tolerancia_geometrica.id_for_label }}">Tolerancia geométrica</label>
         <div class="input-group">
           <span class="input-group-text">Archivo</span>
           {{ form.tolerancia_geometrica }}
         </div>
-        <div class="form-text">Tipos permitidos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
+        {% if lote.tolerancia_geometrica %}
+          <div class="form-text">Actual: <a href="{{ lote.tolerancia_geometrica.url }}" target="_blank">ver archivo</a></div>
+        {% endif %}
+        <div class="form-text">Tipos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
         {% if form.tolerancia_geometrica.errors %}<div class="text-danger small mt-1">{{ form.tolerancia_geometrica.errors }}</div>{% endif %}
       </div>
 
       <div class="col-md-6">
-        <label class="form-label" for="{{ form.pruebas_mecanicas.id_for_label }}">
-          Pruebas mecánicas (dureza + tensión)
-        </label>
+        <label class="form-label" for="{{ form.pruebas_mecanicas.id_for_label }}">Pruebas mecánicas (dureza + tensión)</label>
         <div class="input-group">
           <span class="input-group-text">Archivo</span>
           {{ form.pruebas_mecanicas }}
         </div>
-        <div class="form-text">Sube un único documento (preferible PDF) que incluya ambas pruebas. Tipos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
+        {% if lote.pruebas_mecanicas %}
+          <div class="form-text">Actual: <a href="{{ lote.pruebas_mecanicas.url }}" target="_blank">ver archivo</a></div>
+        {% endif %}
+        <div class="form-text">Sube un único documento (preferible PDF). Tipos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
         {% if form.pruebas_mecanicas.errors %}<div class="text-danger small mt-1">{{ form.pruebas_mecanicas.errors }}</div>{% endif %}
       </div>
 
       <div class="col-md-6">
-        <label class="form-label" for="{{ form.evidencia_fotografica.id_for_label }}">
-          Evidencia fotográfica
-        </label>
+        <label class="form-label" for="{{ form.evidencia_fotografica.id_for_label }}">Evidencia fotográfica</label>
         <div class="input-group">
           <span class="input-group-text">Archivo</span>
           {{ form.evidencia_fotografica }}
         </div>
-        <div class="form-text">Tipos permitidos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
+        {% if lote.evidencia_fotografica %}
+          <div class="form-text">Actual: <a href="{{ lote.evidencia_fotografica.url }}" target="_blank">ver archivo</a></div>
+        {% endif %}
+        <div class="form-text">Tipos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
         {% if form.evidencia_fotografica.errors %}<div class="text-danger small mt-1">{{ form.evidencia_fotografica.errors }}</div>{% endif %}
       </div>
 
       <div class="col-md-6">
-        <label class="form-label" for="{{ form.plano_original.id_for_label }}">
-          Plano original
-        </label>
+        <label class="form-label" for="{{ form.plano_original.id_for_label }}">Plano original</label>
         <div class="input-group">
           <span class="input-group-text">Archivo</span>
           {{ form.plano_original }}
         </div>
-        <div class="form-text">Tipos permitidos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
+        {% if lote.plano_original %}
+          <div class="form-text">Actual: <a href="{{ lote.plano_original.url }}" target="_blank">ver archivo</a></div>
+        {% endif %}
+        <div class="form-text">Tipos: PDF, DOCX, XLSX, JPG, JPEG, PNG</div>
         {% if form.plano_original.errors %}<div class="text-danger small mt-1">{{ form.plano_original.errors }}</div>{% endif %}
       </div>
     </div>
 
     <div class="d-flex justify-content-end gap-2 mt-4">
-      <a href="{% url 'lotes_por_proyecto' proyecto.id %}" class="btn btn-light">Cancelar</a>
-      <button class="btn btn-primary" type="submit">Guardar</button>
+      <a href="{% url 'detalle_lote' lote.id %}" class="btn btn-light">Cancelar</a>
+      <button class="btn btn-primary" type="submit">Guardar cambios</button>
     </div>
   </form>
 </div>
-
-{% block extra_js %}{% endblock %}
 {% endblock %}

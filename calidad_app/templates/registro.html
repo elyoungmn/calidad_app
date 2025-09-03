@@ -1,21 +1,33 @@
 {% extends 'base.html' %}
-{% block title %}Registro · Calidad{% endblock %}
+{% block title %}Solicitar acceso · Calidad{% endblock %}
 {% block content %}
-<div class="card p-4 mx-auto" style="max-width: 520px;">
-  <h1 class="h5 mb-3 text-center">Crear cuenta</h1>
-  <form method="post" class="row g-3">
-    {% csrf_token %}
-    {% for field in form %}
-      <div class="col-12">
-        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field.as_widget(attrs={'class':'form-control'}) }}
-        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-        {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
-      </div>
+<div class="card p-4 mx-auto" style="max-width: 640px;">
+  <h1 class="h5 mb-3">Solicitar acceso</h1>
+  <p class="text-muted mb-4">
+    Completa tus datos. Tu cuenta quedará <strong>pendiente de aprobación</strong> por un administrador.
+    Recibirás acceso una vez aprobada.
+  </p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
-    <div class="col-12 d-grid">
-      <button class="btn btn-primary">Crear cuenta</button>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <!-- Si tu CustomUserCreationForm ya trae los campos estándar -->
+    {{ form.as_p }}
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <a href="{% url 'login' %}" class="btn btn-light">Volver</a>
+      <button class="btn btn-primary" type="submit">Enviar solicitud</button>
     </div>
   </form>
+
+  <div class="text-muted small mt-3">
+    * Solo el administrador puede aprobar o rechazar solicitudes.
+  </div>
 </div>
 {% endblock %}

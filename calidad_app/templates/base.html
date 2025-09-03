@@ -46,6 +46,10 @@
       <ul class="navbar-nav me-auto">
         <li class="nav-item"><a class="nav-link" href="{% url 'ver_proyectos' %}">Proyectos</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'crear_proyecto' %}">Nuevo Proyecto</a></li>
+        {% if request.user.is_staff or request.user.is_superuser %}
+<li class="nav-item"><a class="nav-link" href="{% url 'usuarios_pendientes' %}">Pendientes</a></li>
+{% endif %}
+
       </ul>
 
       <div class="d-flex align-items-center gap-2">
@@ -57,9 +61,10 @@
             <button class="btn btn-outline-light btn-sm" type="submit">Salir</button>
           </form>
         {% else %}
-          <!-- Botón de acceso MÁS CHICO y color claro sobre el navbar -->
-          <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Entrar</a>
-        {% endif %}
+  <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Entrar</a>
+  <a class="btn btn-light btn-sm" href="{% url 'registro_usuario' %}">Solicitar acceso</a>
+{% endif %}
+
       </div>
     </div>
   </div>

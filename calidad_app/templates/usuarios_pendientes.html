@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Usuarios pendientes · Calidad{% endblock %}
+{% block content %}
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h5 mb-0">Usuarios pendientes de aprobación</h1>
+    <div class="d-flex gap-2">
+      <a href="{% url 'usuarios_activos' %}" class="btn btn-outline-primary btn-sm">Usuarios activos</a>
+      <a href="{% url 'ver_proyectos' %}" class="btn btn-light btn-sm">Volver</a>
+    </div>
+  </div>
+
+  {% if pendientes %}
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha registro</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in pendientes %}
+          <tr>
+            <td class="fw-semibold">{{ u.username }}</td>
+            <td>{{ u.get_full_name|default:"—" }}</td>
+            <td>{{ u.email|default:"—" }}</td>
+            <td>{{ u.date_joined|date:"d/m/Y H:i" }}</td>
+            <td class="text-end">
+              <form method="post" action="{% url 'aprobar_usuario_lector' u.id %}" class="d-inline me-1">
+                {% csrf_token %}
+                <button class="btn btn-success btn-sm" title="Solo lectura/descarga">Aprobar lector</button>
+              </form>
+              <form method="post" action="{% url 'aprobar_usuario_editor' u.id %}" class="d-inline me-1">
+                {% csrf_token %}
+                <button class="btn btn-primary btn-sm" title="Puede registrar lotes/crear proyectos">Aprobar editor</button>
+              </form>
+              <form method="post" action="{% url 'eliminar_usuario_pendiente' u.id %}" class="d-inline"
+                    onsubmit="return confirm('¿Eliminar esta solicitud?');">
+                {% csrf_token %}
+                <button class="btn btn-outline-danger btn-sm">Eliminar solicitud</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="text-muted text-center py-5">No hay solicitudes pendientes.</div>
+  {% endif %}
+</div>
+{% endblock %}

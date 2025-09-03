@@ -1,212 +1,140 @@
-# calidad_app/forms.py
 from django import forms
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from mimetypes import guess_type
-import os
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField
+from django.core.validators import FileExtensionValidator
 
-from .models import Proyecto, Lote, CustomUser
-
-
-# ----------------------------
-# Formularios de Usuario (CustomUser)
-# ----------------------------
-
-class CustomUserCreationForm(UserCreationForm):
-    email = forms.EmailField(
-        required=False,
-        widget=forms.EmailInput(attrs={"class": "form-control"}),
-        help_text=_("Opcional, para recuperar contraseña o notificaciones."),
-    )
-
-    class Meta(UserCreationForm.Meta):
-        model = CustomUser
-        fields = ("username", "email")
-        widgets = {
-            "username": forms.TextInput(attrs={"class": "form-control"}),
-        }
+from .models import Proyecto, Lote
 
 
-class CustomUserChangeForm(UserChangeForm):
-    class Meta:
-        model = CustomUser
-        fields = ("username", "email", "first_name", "last_name", "is_active", "is_staff")
-        widgets = {
-            "username": forms.TextInput(attrs={"class": "form-control"}),
-            "email": forms.EmailInput(attrs={"class": "form-control"}),
-            "first_name": forms.TextInput(attrs={"class": "form-control"}),
-            "last_name": forms.TextInput(attrs={"class": "form-control"}),
-        }
+class DateInput(forms.DateInput):
+    input_type = "date"
 
 
 # ----------------------------
-# Formularios de negocio
+# Proyecto
 # ----------------------------
-
 class ProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
         fields = ["nombre", "cliente", "piezas_totales", "activo"]
         widgets = {
-            "nombre": forms.TextInput(attrs={"class": "form-control"}),
-            "cliente": forms.TextInput(attrs={"class": "form-control"}),
-            "piezas_totales": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
+            "nombre": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nombre del proyecto"}),
+            "cliente": forms.TextInput(attrs={"class": "form-control", "placeholder": "Cliente"}),
+            "piezas_totales": forms.NumberInput(attrs={"class": "form-control", "min": "0"}),
             "activo": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
 
-# Reglas estrictas por tipo de documento (extensión + MIME por nombre)
-ALLOWED = {
-    "analisis_espectrometrico": (
-        [".pdf", ".xlsx", ".xls", ".csv", ".png"],
-        [
-            "application/pdf",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "application/vnd.ms-excel",
-            "text/csv",
-        ],
-    ),
-    "tolerancia_geometrica": (
-        [".pdf", ".dxf", ".dwg", ".png"],
-        [
-            "application/pdf",
-            "image/vnd.dxf",
-            "application/acad",  # DWG en algunos entornos
-        ],
-    ),
-    "prueba_dureza": (
-        [".pdf", ".xlsx", ".xls", ".csv", ".jpg", ".jpeg", ".png"],
-        [
-            "application/pdf",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "application/vnd.ms-excel",
-            "text/csv",
-            "image/jpeg",
-            "image/png",
-        ],
-    ),
-    "prueba_tension": (
-        [".pdf", ".xlsx", ".xls", ".csv", ".jpg", ".jpeg", ".png"],
-        [
-            "application/pdf",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "application/vnd.ms-excel",
-            "text/csv",
-            "image/jpeg",
-            "image/png",
-        ],
-    ),
-    "evidencia_fotografica": (
-        [".jpg", ".jpeg", ".png", ".pdf", ".png"],
-        [
-            "image/jpeg",
-            "image/png",
-            "application/pdf",
-        ],
-    ),
-    "plano_original": (
-        [".pdf", ".dxf", ".dwg", ".png"],
-        [
-            "application/pdf",
-            "image/vnd.dxf",
-            "application/acad",
-        ],
-    ),
-}
-
-
-def _validate_ext_mime(field_name: str, file_field):
-    """
-    Valida extensión y MIME (estimado por nombre). Si el navegador reporta
-    content_type en el upload, también puede usarse en la vista para reforzar.
-    ¡OJO! No sombrear '_' (gettext) con variables locales.
-    """
-    if not file_field:
-        return
-    name = (file_field.name or "").lower()
-    ext = os.path.splitext(name)[1]
-    exts, mimes = ALLOWED[field_name]
-
-    if ext not in exts:
-        raise forms.ValidationError(
-            _("%(campo)s: extensión no permitida (%(ext)s). Permitidas: %(permitidas)s"),
-            params={
-                "campo": field_name.replace("_", " ").title(),
-                "ext": ext or "—",
-                "permitidas": ", ".join(exts),
-            },
-        )
-
-    mime_from_name, _encoding = guess_type(name)  # ¡No usar '_' aquí!
-    if mime_from_name and mime_from_name not in mimes:
-        raise forms.ValidationError(
-            _("%(campo)s: tipo MIME no permitido (%(mime)s). Permitidos: %(permitidos)s"),
-            params={
-                "campo": field_name.replace("_", " ").title(),
-                "mime": mime_from_name,
-                "permitidos": ", ".join(mimes),
-            },
-        )
-
+# ----------------------------
+# Lote (para alta normal)
+# ----------------------------
+_FILE_VALIDATOR = FileExtensionValidator(
+    allowed_extensions=["pdf", "jpg", "jpeg", "png", "docx", "xlsx"]
+)
 
 class LoteForm(forms.ModelForm):
     """
-    Form para registrar un Lote DENTRO de un proyecto ya seleccionado.
-    El proyecto se inyecta por __init__(proyecto=...) y se asigna en la vista.
+    'proyecto' y 'subido_por' no se muestran; se fijan en la vista.
     """
-    def __init__(self, *args, proyecto: Proyecto | None = None, **kwargs):
+    analisis_espectrometrico = forms.FileField(required=False, validators=[_FILE_VALIDATOR])
+    tolerancia_geometrica   = forms.FileField(required=False, validators=[_FILE_VALIDATOR])
+    pruebas_mecanicas       = forms.FileField(required=False, validators=[_FILE_VALIDATOR])
+    evidencia_fotografica   = forms.FileField(required=False, validators=[_FILE_VALIDATOR])
+    plano_original          = forms.FileField(required=False, validators=[_FILE_VALIDATOR])
+
+    def __init__(self, *args, proyecto=None, **kwargs):
         self.proyecto = proyecto
         super().__init__(*args, **kwargs)
 
+        self.fields["id_lote"].widget = forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "00001"}
+        )
+        self.fields["fecha"].widget = DateInput(attrs={"class": "form-control"})
+        self.fields["numero_partes"].widget = forms.NumberInput(
+            attrs={"class": "form-control", "min": "0"}
+        )
+
+        file_widgets = {"class": "form-control"}
+        for f in [
+            "analisis_espectrometrico",
+            "tolerancia_geometrica",
+            "pruebas_mecanicas",
+            "evidencia_fotografica",
+            "plano_original",
+        ]:
+            self.fields[f].widget = forms.ClearableFileInput(attrs=file_widgets)
+            self.fields[f].widget.attrs.update({
+                "accept": ".pdf,.docx,.xlsx,.jpg,.jpeg,.png"
+            })
+
+        # Etiquetas amigables
+        self.fields["id_lote"].label = "ID de Lote"
+        self.fields["fecha"].label = "Fecha"
+        self.fields["numero_partes"].label = "Número de partes"
+        self.fields["analisis_espectrometrico"].label = "Análisis espectrométrico"
+        self.fields["tolerancia_geometrica"].label = "Tolerancia geométrica"
+        self.fields["pruebas_mecanicas"].label = "Pruebas mecánicas (dureza + tensión)"
+        self.fields["evidencia_fotografica"].label = "Evidencia fotográfica"
+        self.fields["plano_original"].label = "Plano original"
+
+        # Ayuda
+        self.fields["pruebas_mecanicas"].help_text = "Sube un único documento (preferible PDF) que incluya ambas pruebas."
+
     class Meta:
         model = Lote
-        # OJO: NO incluimos 'proyecto' aquí
         fields = [
             "id_lote",
             "fecha",
             "numero_partes",
             "analisis_espectrometrico",
             "tolerancia_geometrica",
-            "prueba_dureza",
-            "prueba_tension",
+            "pruebas_mecanicas",
             "evidencia_fotografica",
             "plano_original",
         ]
-        widgets = {
-            "id_lote": forms.TextInput(attrs={"class": "form-control", "placeholder": "00001"}),
-            "fecha": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
-            "numero_partes": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
-            "analisis_espectrometrico": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "tolerancia_geometrica": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "prueba_dureza": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "prueba_tension": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "evidencia_fotografica": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "plano_original": forms.ClearableFileInput(attrs={"class": "form-control"}),
-        }
 
-    def clean(self):
-        cleaned = super().clean()
 
-        # Validación por tipo/archivo (solo si el usuario adjuntó algo)
-        for field in [
-            "analisis_espectrometrico",
-            "tolerancia_geometrica",
-            "prueba_dureza",
-            "prueba_tension",
-            "evidencia_fotografica",
-            "plano_original",
-        ]:
-            f = cleaned.get(field)
-            if f:
-                _validate_ext_mime(field, f)
+# ----------------------------
+# Lote (edición por admin: permite cambiar subido_por)
+# ----------------------------
+class LoteAdminForm(LoteForm):
+    subido_por = forms.ModelChoiceField(
+        queryset=get_user_model().objects.filter(is_active=True).order_by("username"),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Responsable (subido por)"
+    )
 
-        # Reglas de negocio: numero_partes no debe exceder piezas_totales del proyecto
-        proyecto = self.proyecto  # viene de la vista
-        numero_partes = cleaned.get("numero_partes") or 0
-        if proyecto and proyecto.piezas_totales and numero_partes > proyecto.piezas_totales:
-            self.add_error(
-                "numero_partes",
-                _("El número de partes del lote (%(np)s) excede las piezas totales del proyecto (%(pt)s)."),
-            )
+    class Meta(LoteForm.Meta):
+        fields = LoteForm.Meta.fields + ["subido_por"]
 
-        return cleaned
+
+# ----------------------------
+# Usuarios
+# ----------------------------
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = get_user_model()
+        fields = ("username", "first_name", "last_name", "email")
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    username = UsernameField(
+        widget=forms.TextInput(
+            attrs={
+                "autofocus": True,
+                "class": "form-control",
+                "placeholder": "Nombre de usuario",
+            }
+        )
+    )
+    password = forms.CharField(
+        label="Contraseña",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Contraseña",
+            }
+        ),
+    )
